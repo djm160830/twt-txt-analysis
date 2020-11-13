@@ -20,6 +20,8 @@ import spacy
 # Real-time graph updating
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import asyncio
+import time
 
 # Debugging
 import inspect
@@ -43,6 +45,7 @@ ACCESS_TOKEN_SECRET=os.getenv('ACCESS_TOKEN_SECRET')
 # COORDINATES='32.77,-96.79'
 # COORDINATES=["-122.75,36.8,-121.75,37.8,-74,40,-73,41"]
 # COORDINATES=["-98.49243164062501,29.38217507514529,-96.80053710937501,32.8149783969858"] # long-lat,long-lat
+# Dallas, Houston, San Francisco, New York
 COORDINATES=["-97.94311523437501,32.31499127724556,-96.470947265625,33.04550781490999,\
 				-95.71289062500001,29.46829664171322,-95.05371093750001,30.050076521698735,\
 				-118.56445312500001,33.58716733904659,-117.69653320312501,34.243594729697406,\
@@ -63,6 +66,7 @@ def listener():
 		access_token_secret=ACCESS_TOKEN_SECRET)
 
 fig = plt.figure()
+fig.set_size_inches((11, 5))
 #creating a subplot 
 ax1 = fig.add_subplot(1,1,1)
 xs = []
@@ -79,37 +83,111 @@ async def async_generator():
 			yield thing["ORG"]+=1
 """
 
-def animate(i, itr):
-	# x,y=next(itr)
-	# x=next(itr)
-	pdb.set_trace()
+# def animate was here above TxtTxtAnalysis
 
-	# print(f'i: {i}, x: {x}, y: {y}')
-	ax1.clear()
+api = listener()
+class TwtTxtAnalysis():
 
-	# x,y = thing[1]
+	def __init__(self):
+		# Plot data and read tweets at the same time
+		loop = asyncio.get_event_loop()
+		try:
+			loop.run_until_complete(self.animate())
+		finally:
+			loop.run_until_complete(
+				loop.shutdown_asyncgens())
+			# ani = animation.FuncAnimation(fig, self.animate, fargs=[thing], interval=1000) # fargs=[it] works | took out fargs=[thing]
+			loop.close()
+			plt.show() # Keep plot window open
 
-	# print(f'xs: {xs}, ys: {ys}')
-	# xs.append(float(x))
-	# ys.append(float(y))
-   
-	# ax1.plot(xs, ys)
-	ax1.bar(list(itr.keys()), list(itr.values()))
 
-	plt.xlabel('Date')
-	plt.ylabel('Price')
-	plt.title('Live graph with matplotlib')
+	async def read_tweets(self):
+		# Get a filtered view of public statuses
+		# NOTE: check if there is a line['extended_tweet']['full_text'] before line['text']
+		timeout = time.time()+20
+		for line in api.GetStreamFilter(locations=COORDINATES, languages=LANGUAGES): # I REMOVED track=USERS
+			if time.time()>timeout: break
+			else:
+				raw = line['extended_tweet']['full_text'] if 'extended_tweet' in line else line['text']
+				# Set up doc
+				# txt = raw.lower() 
+				# COPY EVERYTHING BELOW INTO HERE, FIGURE OUT A WAY TO PRINT COUNTS AND STUFF IN REAL TIME
+				txt = re.sub("@\s", "at ", raw, flags=re.IGNORECASE)
+				txt = re.sub("([a-z])([A-Z])" r'\1 \2', txt) # THIS CAUSES ERORR. I JUST WANT TO PUT A SPACE BETWEEN
+				# THE TWO MATCHED ITEMS SO STUFF LIKE MichelleObama TURNS INTO Michelle Obama AND THE ENTITY RECOGNIZTER 
+				# RECOGNIZES IT AS A PERSON INSTEAD OF AN ORGANIZATION.
+				#@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ START HERE DONT RUN ANYTHING BC THERES ERROR AS A RESULT
+				txt = re.sub("@+|#+|((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])+|[^\\u0000-\\u007F]+|(&amp)+", "", txt, flags=re.IGNORECASE)
+				# txt = re.sub("(@(\w){1,15}(?!\w))","",txt)
+				# txt = re.sub("[^a-z0-9\s]","",txt)
+				doc = nlp(txt)
+
+				await asyncio.sleep(.4)
+				if doc.ents:
+					print(f'==RAW: {raw}')
+					print(f'==RES: {doc}')
+					yield [(X.text, X.label_) for X in doc.ents]
+				else:
+					continue
+
+				# Check if doc.ents is a list so you can do the next line correctly
+				# print(f'This should be the text and then label: {}, {}')
+				# DON'T RUN ANYTHIG YET FINISH OPERATIONS IN HERE
+
+
+		# txt=line['text']
+		# tt=txt.lower()
+		# ttt=re.sub("(@(\w){1,15}(?!\w))","",tt)
+		# tttt=re.sub("[^a-z0-9\s]","",ttt)
+		# doc=nlp(tttt)
+		# [(X.text,X.label_) for X in doc.ents]
+
+
+	# async def animate(self, i, itr):
+	async def animate(self):
+		# x,y=next(itr)
+		# x=next(itr)
+
+		# print(f'i: {i}, x: {x}, y: {y}')
+		ax1.clear()
+
+		# x,y = thing[1]
+
+		# print(f'xs: {xs}, ys: {ys}')
+		# xs.append(float(x))
+		# ys.append(float(y))
+	   
+		# ax1.plot(xs, ys)
+		# ax1.bar(list(itr.keys()), list(itr.values()))
+
+		plt.xlabel('Entity')
+		plt.ylabel('Count')
+		plt.title('Live graph with matplotlib')
+
+		# Get updated dictionary
+		async for entities in self.read_tweets():
+			print(f'entities: {entities}\n')
+			for _, e in entities:
+				if e not in thing: 
+					thing[e]=1
+				else:
+					thing[e]+=1
+			ax1.bar(list(thing.keys()), list(thing.values()), color='blue')
+			plt.pause(0.01)
+			# pdb.set_trace()
+
+
 
 if __name__ == "__main__":
+	TwtTxtAnalysis()
 	# Set up a listener
-	api = listener()
+	# api = listener() 
 
 
 	# ani = animation.FuncAnimation(fig, animate, fargs=[it], interval=1000) # fargs=[it] works
-	ani = animation.FuncAnimation(fig, animate, fargs=[thing], interval=1000) # fargs=[it] works
-	plt.show()
+	# plt.show()
 
-	pdb.set_trace()
+	# pdb.set_trace()
 
 """
 	pdb.set_trace()
