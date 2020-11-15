@@ -6,3 +6,7 @@ Extracting Tweets in real time using python-twitter library and analyzing the co
 Install requirements: `pip install -r requirements.txt`  
 Type `python hw5.py` into command line and press `Enter`
 ## Expected result
+
+#### If you would like to redirect terminal output to stdout
+`set PYTHONIOENCODING=utf-8`
+`python hw5.py > results.txt`

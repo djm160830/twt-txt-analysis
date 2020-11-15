@@ -7,20 +7,18 @@
 import os
 import spacy
 from dotenv import load_dotenv
-
 # Getting tweets + preprocessing
 import twitter
 import re
-
 # Real-time graph updating
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import asyncio
 import time
-
 # Debugging
 import inspect
 import pdb
+
 
 # Get recognizer
 nlp = spacy.load("en_core_web_sm")
@@ -28,22 +26,24 @@ project_folder = os.getcwd()  # Get current directory
 load_dotenv(os.path.join(project_folder, '.env')) # Read from .env
 
 # Twitter API
-API_KEY=os.getenv('API_KEY')
-API_KEY_SECRET=os.getenv('API_KEY_SECRET')
-ACCESS_TOKEN=os.getenv('ACCESS_TOKEN')
-ACCESS_TOKEN_SECRET=os.getenv('ACCESS_TOKEN_SECRET')
-# Stream filter parameters
-# USERS=['@twitter']
-# Dallas, Houston, San Francisco, New York
-COORDINATES=["-97.94311523437501,32.31499127724556,-96.470947265625,33.04550781490999,\
-				-95.71289062500001,29.46829664171322,-95.05371093750001,30.050076521698735,\
-				-118.56445312500001,33.58716733904659,-117.69653320312501,34.243594729697406,\
-				-121.88232421875001,38.19502155795575,-121.11328125000001,38.90813299596705,\
-				-122.87109375000001,47.18971246448421,-121.88232421875001,47.65058757118736,\
-				-74.54772949218751,40.35282369083777,-72.97668457031251,41.529141988723104"] # long-lat, long-lat
-LANGUAGES=['en']    
+API_KEY = os.getenv('API_KEY')
+API_KEY_SECRET = os.getenv('API_KEY_SECRET')
+ACCESS_TOKEN = os.getenv('ACCESS_TOKEN')
+ACCESS_TOKEN_SECRET = os.getenv('ACCESS_TOKEN_SECRET')
+# Los Angeles, San Francisco, rural CA, Dallas, Houston, rural TX, rural&urban NY, Boston, rural MA
+COORDINATES = ["-117.42187500000001,34.34343606848294,-118.55895996093751,33.64663552343716,\
+				-121.84661865234376,37.85967565921003,-122.49481201171876,37.182202221079805,\
+				-116.26831054687501,36.02244668175846,-118.1689453125,35.137879119634185,\
+				-96.405029296875,33.02708758002874,-97.71240234375001,32.38923910985902,\
+				-95.00976562500001,29.954934549656144,-95.70190429687501,29.46829664171322,\
+				-100.96984863281251,31.737511125687828,-102.32116699218751,30.963479049959364,\
+				-74.10552978515626,42.56926437219384,-74.64660644531251,42.29762739128458\
+				-73.30078125000001,41.12074559016745,-74.67407226562501,40.43022363450862,\
+				-70.88653564453126,42.48830197960227,-71.20788574218751,42.18782901059085,\
+				-72.65602111816408,42.71927257380149,-72.86819458007814,42.525760129656845"] # long-lat, long-lat
+LANGUAGES = ['en']    
 
-
+# Return twitter listener
 def listener():
 	return twitter.Api(
 		consumer_key=API_KEY,
@@ -52,19 +52,18 @@ def listener():
 		access_token_secret=ACCESS_TOKEN_SECRET)
 
 
-# Plot
-fig = plt.figure()
-fig.set_size_inches((11,5))
-ax1 = fig.add_subplot(1,1,1)
-xs = []
-ys = []
-
-thing = dict()
-
-api = listener()
+# Reads tweets in real time from twitter, and outputs entity counts as a pyplot graph
 class TwtTxtAnalysis():
-
 	def __init__(self):
+		# Plot
+		self.fig = plt.figure()
+		self.fig.set_size_inches((11,5))
+		self.ax = self.fig.add_subplot(1,1,1)
+		# Tweet, entity vars
+		self.api = listener()
+		self.doc = None
+		self.d = dict()
+		
 		# Plot data and read tweets at the same time
 		loop = asyncio.get_event_loop()
 		try:
@@ -75,49 +74,51 @@ class TwtTxtAnalysis():
 			loop.close()
 			plt.show() # Keep plot window open
 
+	# Prepare tweets to be accurately analyzed by nlp
+	async def clean_tweets(self, raw):
+		# Helps nlp recognize location-type entities
+		txt = re.sub('@\s', 
+			"at ", 
+			raw, 
+			flags=re.IGNORECASE) 
+		# Remove #, @, and emojis
+		txt1 = re.sub('#[a-zA-Z0-9]+\w?|@|(&amp)+;?|[\u2020-\U0001FADF]+', 
+			"", 
+			txt)
+		# Remove website links 
+		txt2 = re.sub('((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])+', 
+			"", 
+			txt1, 
+			flags=re.IGNORECASE)
+		# Helps nlp with 'PERSON' recognition. ex) MichelleObama (not recognized) -> Michelle Obama (Recognized)
+		clean = re.compile(r'([a-z])([A-Z])')
+		txt3 = re.sub(clean, 
+			r'\1 \2', 
+			txt2)
+
+		self.doc = txt3
+
+	# Yields list of entities from tweets to graph animator
 	async def read_tweets(self):
 		# Get a filtered view of public statuses
 		timeout = time.time()+30
-		for line in api.GetStreamFilter(locations=COORDINATES, languages=LANGUAGES): # I REMOVED track=USERS
+		for line in self.api.GetStreamFilter(locations=COORDINATES, languages=LANGUAGES): 
 			if time.time()>timeout: break
 			else:
-				raw = line['extended_tweet']['full_text'] if 'extended_tweet' in line else line['text']
-				# Set up doc
-				# Helps recognize location-type entities
-				txt = re.sub('@\s', 
-					"at ", 
-					raw, 
-					flags=re.IGNORECASE) 
-				# Remove hashtags and @ | removed [\u263a-\U0001f645] , \u00A0-\U0001FADF
-				txt1 = re.sub('#[a-zA-Z0-9]+\w?|@|(&amp)+;?|[\u2020-\U0001FADF]+', 
-					"", 
-					txt)
-				# Remove website links [^\\u0000-\\u007F]
-				txt2 = re.sub('((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])+', 
-					"", 
-					txt1, 
-					flags=re.IGNORECASE)
-				# Helps 'PERSON' recognition. MichelleObama (not recognized) -> Michelle Obama (Recognized)
-				clean = re.compile(r'([a-z])([A-Z])')
-				txt3 = re.sub(clean, 
-					r'\1 \2', 
-					txt2)
-				doc = nlp(txt3)
+				raw_tweet = line['extended_tweet']['full_text'] if 'extended_tweet' in line else line['text']
+				await self.clean_tweets(raw_tweet)
+	
+				doc = nlp(self.doc)
 
-				await asyncio.sleep(.4)
 				if doc.ents:
-					# if raw!=doc: print(f'==RAW: {raw}')
-					# if txt!=raw: print(f'	0=INTERMEDIATE: {txt}')
-					# if txt1!=txt: print(f'	1=INTERMEDIATE: {txt1}') 
-					# if txt2!=txt1: print(f'	2=INTERMEDIATE: {txt2}') 
-					# if txt3!=txt2: print(f'	3=INTERMEDIATE: {txt3}') 
-					print(f'==RES: {doc}')
+					print(f'==RAW: {raw_tweet}')
 					yield [(X.text, X.label_) for X in doc.ents]
 				else:
 					continue
 
+	# Draw bar graph using recognized entities
 	async def animate(self):
-		ax1.clear()
+		self.ax.clear()
 		plt.xlabel('Entity')
 		plt.ylabel('Count')
 		plt.title('Live graph with matplotlib')
@@ -125,12 +126,13 @@ class TwtTxtAnalysis():
 		# Get updated dictionary
 		async for entities in self.read_tweets():
 			print(f'==ENT: {entities}\n\n')
+			# Increment entity count
 			for _, e in entities:
-				if e not in thing: 
-					thing[e]=1
+				if e not in self.d: 
+					self.d[e] = 1
 				else:
-					thing[e]+=1
-			ax1.bar(list(thing.keys()), list(thing.values()), color='blue')
+					self.d[e] += 1
+			self.ax.bar(list(self.d.keys()), list(self.d.values()), color='blue')
 			plt.pause(0.01)
 
 if __name__ == "__main__":
