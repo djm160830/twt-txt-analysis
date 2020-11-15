@@ -10,6 +10,8 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 `$ python hw5.py > results.txt`  
 #### If you would like to view terminal output
 `$ python hw5.py`
+#### If you would not like to view any terminal output
+`$ python hw5.py > NUL`
 ## Expected results
 
 #### Terminal output (example)
