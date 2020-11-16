@@ -3,7 +3,7 @@ Python version: Python 3.7.6
 Extracting Tweets in real time using python-twitter library and displaying the count of named entities returned by spaCy's named entity recognizer with matplotlib's pyplot. 
 
 ## How to run
-#### Install requirements 
+#### Install requirements  
 `$ pip install -r requirements.txt`  
 #### If you would like to redirect terminal output to text file
 `$ set PYTHONIOENCODING=utf-8`  
@@ -36,12 +36,21 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 ![matplotlib graph](https://github.com/djm160830/twt-txt-analysis/blob/master/bar_graph.png)
 
 ## Parameters used
-###### locations
+###### locations 
 Los Angeles, San Francisco, rural CA,  
 Dallas, Houston, rural TX,  
 rural & urbal NY,  
 Boston, rural MA
 ###### languages
 English
+###### time intervals
+1:10am to 2:10am  
+9:40am to 10:00am*  
+10:19am to 11:19am*  
+1:00pm to 2:00pm  
+3:00pm to 4:00pm
+
+\* = Interval may have been shortened due to internet connection.  
+**NOTE**: Time interval is not an actual parameter used in python-twitter stream filter. I used a timeout created by `time.time() + <amount of time I want to collect tweets in seconds>` in line 104. 
 
 
