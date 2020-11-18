@@ -3,8 +3,10 @@ Python version: Python 3.7.6
 Extracting Tweets in real time using python-twitter library and displaying the count of named entities returned by spaCy's named entity recognizer with matplotlib's pyplot. 
 
 ## How to run
-#### Install requirements  
-`$ pip install -r requirements.txt`  
+#### Install requirements 
+`$ pip install -r requirements.txt`
+#### Set environment variable
+`set PYTHONIOENCODING=utf-8` to avoid "<i>charmap codec can't encode character</i>" error.   
 #### If you would like to redirect terminal output to text file
 `$ set PYTHONIOENCODING=utf-8`  
 `$ python hw5.py > results.txt`  
@@ -36,7 +38,7 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 ![matplotlib graph](https://github.com/djm160830/twt-txt-analysis/blob/master/bar_graph.png)
 
 ## Parameters used
-###### locations 
+###### locations  
 Los Angeles, San Francisco, rural CA,  
 Dallas, Houston, rural TX,  
 rural & urbal NY,  
