@@ -16,23 +16,29 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 `$ python hw5.py > NUL`
 ## Expected results
 
-#### Terminal output (example)
+#### Terminal output (example)  
+`<number>==RAW` refers to the raw Tweet.  
+`====ENT` refers to the entities that were recognized in the Tweet.  
+`==COUNT` refers to the total count for each entity so far.  
 ```
-1==RAW: Wind 0.0 mph -. Barometer 30.009 in, Falling quickly. Temperature 38.0 °F. Rain today 0.00in. Humidity 77%
-==ENT: [('0.0 mph', 'QUANTITY'), ('30.009', 'CARDINAL'), ('38.0', 'CARDINAL'), ('0.00', 'CARDINAL'), ('77%', 'PERCENT')]
+93==RAW: I miss Ed, Edd n Eddy. They made me believe that Jaw-breakers were something to die for and ill always cherish that
+====ENT: [('Ed', 'PERSON'), ('Edd n Eddy', 'ORG'), ('Jaw-breakers', 'PERSON')]
+==COUNT: {'ORG': 14, 'PERSON': 18, 'CARDINAL': 11, 'GPE': 8, 'TIME': 6, 'ORDINAL': 3, 'DATE': 9, 'LAW': 1, 'FAC': 8, 'WORK_OF_ART': 1, 'PERCENT': 1}
 
 
-3==RAW: Chameleon #vibes
-🦎 #mattpratt #actor #losangeles #hi #casting #la @ Los Angeles, California https://t.co/aZ6ekHSVLQ
-==ENT: [('Chameleon', 'ORG'), ('Los Angeles', 'GPE'), ('California', 'GPE')]
+149==RAW: In case you missed it Trump lost Michigan for the 87th time, tonight.
+====ENT: [('Trump', 'ORG'), ('Michigan', 'GPE'), ('87th', 'ORDINAL'), ('tonight', 'TIME')]
+==COUNT: {'ORG': 23, 'PERSON': 40, 'CARDINAL': 18, 'GPE': 12, 'TIME': 8, 'ORDINAL': 6, 'DATE': 13, 'LAW': 1, 'FAC': 9, 'WORK_OF_ART': 2, 'PERCENT': 1, 'QUANTITY': 1, 'MONEY': 1, 'NORP': 2}
 
 
-4==RAW: @realDonaldTrump Moron
-==ENT: [('Donald Trump Moron', 'PERSON')]
+372==RAW: I knew sooner or later @Twitter will follow with stories and to be honest I’m not happy but whatever...I guess 🤦🏻‍♀️🤷🏻‍♀️
+====ENT: [('Twitter', 'ORG')]
+==COUNT: {'ORG': 59, 'PERSON': 124, 'CARDINAL': 31, 'GPE': 32, 'TIME': 12, 'ORDINAL': 10, 'DATE': 36, 'LAW': 1, 'FAC': 13, 'WORK_OF_ART': 4, 'PERCENT': 2, 'QUANTITY': 4, 'MONEY': 2, 'NORP': 11, 'LOC': 2, 'PRODUCT': 2}
 
 
-5==RAW: 23:51 Temp. 71.6°F, Hum. 75%, Dewp. 61.3°F, Bar. 29.91 inHg, Rain Today 0 inch, Wind 229° 2.1 kn
-==ENT: [('23:51', 'CARDINAL'), ('71.6', 'CARDINAL'), ('Hum', 'PERSON'), ('75%', 'PERCENT'), ('Dewp', 'ORG'), ('61.3', 'CARDINAL'), ('29.91', 'CARDINAL'), ('Hg', 'GPE'), ('Rain Today 0', 'PERSON'), ('229', 'CARDINAL')]
+409==RAW: What’s the move tonight Houston?
+====ENT: [('tonight', 'TIME'), ('Houston', 'GPE')]
+==COUNT: {'ORG': 66, 'PERSON': 127, 'CARDINAL': 33, 'GPE': 40, 'TIME': 16, 'ORDINAL': 10, 'DATE': 41, 'LAW': 1, 'FAC': 13, 'WORK_OF_ART': 5, 'PERCENT': 2, 'QUANTITY': 5, 'MONEY': 2, 'NORP': 11, 'LOC': 2, 'PRODUCT': 2}
 ```
 #### matplotlib.pyplot bar graph
 ![matplotlib graph](https://github.com/djm160830/twt-txt-analysis/blob/master/bar_graph.png)
