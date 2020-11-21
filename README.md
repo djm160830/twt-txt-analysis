@@ -15,10 +15,8 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 #### If you would not like to view any terminal output
 `$ python hw5.py > NUL`
 ## Expected results
-
-#### Terminal output (example)  
 Code will run for 20 seconds according to line 101 in hw5.py (`timeout = time.time()+20`). You may change it to make it run for longer.  
-
+#### Terminal output (example)  
 `<number>==RAW` refers to the raw Tweet.  
 `====ENT` refers to the entities that were recognized in the Tweet.  
 `==COUNT` refers to the total count for each entity so far.  
