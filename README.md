@@ -60,6 +60,6 @@ Figure 3: 19:22:27.23 – 20:22:27.23 Wed 11/18/2020
 Figure 4: 22:44:49.51 – 23:44:49.51 Wed 11/18/2020  
 Figure 5: 07:31:46.52 – 8:31:46.52 Thu 11/19/2020  
   
-**NOTE**: Time interval is not an actual parameter used in python-twitter stream filter. I used a timeout created by `time.time() + <amount of time I want to collect tweets in seconds>` in line 104. 
+**NOTE**: Time interval is not an actual parameter used in python-twitter stream filter. I used a timeout created by `time.time() + <amount of time I want to collect tweets in seconds>` in line 101. 
 
 
