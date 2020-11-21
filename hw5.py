@@ -15,9 +15,6 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import asyncio
 import time
-# Debugging
-import inspect
-import pdb
 
 
 # Get recognizer
@@ -101,7 +98,7 @@ class TwtTxtAnalysis():
 	# Yields list of entities from tweets to graph animator
 	async def read_tweets(self):
 		# Get a filtered view of public statuses
-		timeout = time.time()+30
+		timeout = time.time()+20
 		for i, line in enumerate(self.api.GetStreamFilter(locations=COORDINATES, languages=LANGUAGES)): 
 			if time.time()>timeout: break
 			else:
@@ -125,13 +122,14 @@ class TwtTxtAnalysis():
 
 		# Get updated dictionary
 		async for entities in self.read_tweets():
-			print(f'==ENT: {entities}\n\n')
+			print(f'====ENT: {entities}')
 			# Increment entity count
 			for _, e in entities:
 				if e not in self.d: 
 					self.d[e] = 1
 				else:
 					self.d[e] += 1
+			print(f'==COUNT: {self.d}\n\n')
 			self.ax.bar(list(self.d.keys()), list(self.d.values()), color='blue')
 			plt.pause(0.01)
 
