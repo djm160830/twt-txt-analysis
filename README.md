@@ -3,7 +3,7 @@ Python version: Python 3.7.6
 Extracting Tweets in real time using python-twitter library and displaying the count of named entities returned by spaCy's named entity recognizer with matplotlib's pyplot. 
 
 ## How to run
-#### Install requirements 
+#### Install requirements  
 `$ pip install -r requirements.txt`
 #### Set environment variable
 `set PYTHONIOENCODING=utf-8` to avoid "<i>charmap codec can't encode character</i>" error.   
@@ -11,12 +11,14 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 `$ set PYTHONIOENCODING=utf-8`  
 `$ python hw5.py > results.txt`  
 #### If you would like to view terminal output
-`$ python hw5.py`
+`$	 python hw5.py`
 #### If you would not like to view any terminal output
 `$ python hw5.py > NUL`
 ## Expected results
 
 #### Terminal output (example)  
+Code will run for 20 seconds according to line 101 in hw5.py (`timeout = time.time()+20`). You may change it to make it run for longer.  
+
 `<number>==RAW` refers to the raw Tweet.  
 `====ENT` refers to the entities that were recognized in the Tweet.  
 `==COUNT` refers to the total count for each entity so far.  
@@ -52,13 +54,12 @@ Boston, rural MA
 ###### languages
 English
 ###### time intervals
-1:10am to 2:10am  
-9:40am to 10:00am*  
-10:19am to 11:19am*  
-1:00pm to 2:00pm  
-3:00pm to 4:00pm
-
-\* = Interval may have been shortened due to internet connection.  
+Figure 1: 22:46:40.34 – 23:46:40.34 Tue 11/17/2020  
+Figure 2: 08:15:09.65 – 9:15:09.65 Wed 11/18/2020  
+Figure 3: 19:22:27.23 – 20:22:27.23 Wed 11/18/2020  
+Figure 4: 22:44:49.51 – 23:44:49.51 Wed 11/18/2020  
+Figure 5: 07:31:46.52 – 8:31:46.52 Thu 11/19/2020  
+  
 **NOTE**: Time interval is not an actual parameter used in python-twitter stream filter. I used a timeout created by `time.time() + <amount of time I want to collect tweets in seconds>` in line 104. 
 
 
