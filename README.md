@@ -9,7 +9,7 @@ Extracting Tweets in real time using python-twitter library and displaying the c
 `set PYTHONIOENCODING=utf-8` to avoid "<i>charmap codec can't encode character</i>" error.   
 #### If you would like to redirect terminal output to text file
 `$ set PYTHONIOENCODING=utf-8`  
-`$ python hw5.py > results.txt`  
+`$ python twt-txt-analysis.py > results.txt`  
 #### If you would like to view terminal output
 `$	 python hw5.py`
 #### If you would not like to view any terminal output
