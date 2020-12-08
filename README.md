@@ -47,7 +47,7 @@ Code will run for 20 seconds according to line 101 in hw5.py (`timeout = time.ti
 ###### locations  
 Los Angeles, San Francisco, rural CA,  
 Dallas, Houston, rural TX,  
-rural & urbal NY,  
+rural & urban NY,  
 Boston, rural MA
 ###### languages
 English
