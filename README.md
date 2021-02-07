@@ -1,6 +1,6 @@
 Python version: Python 3.7.6  
 
-Extracting Tweets in real time using python-twitter library and displaying the count of named entities returned by spaCy's named entity recognizer with matplotlib's pyplot. 
+Extracting Tweets continuously using python-twitter library and displaying the count of named entities returned by spaCy's named entity recognizer with matplotlib's pyplot. 
 
 ## How to run
 #### Install requirements  
